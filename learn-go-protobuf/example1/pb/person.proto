@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+
+package person;
+
+option go_package="./person";
+
+enum Sex{
+    MAN = 0;
+    WOMAN = 1;
+}
+
+message Person{
+    string name = 1;
+    int32 age = 2;
+    Sex sex = 3;
+}
+
+message Class{
+    repeated Person classmates = 1;
+}

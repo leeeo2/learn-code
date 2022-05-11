@@ -1,0 +1,1 @@
+protoc -I./pb --go_out=./person --go_opt=paths=source_relative ./pb/person.proto

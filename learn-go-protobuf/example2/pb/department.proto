@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package="./pb";
+
+
+message Department{
+    int32 id = 1;
+    string name = 2;
+    repeated EmployeeMessage employees= 3;
+    Department parent_department =4;
+    repeated Department children_department = 5;
+}
+
+
+message EmployeeMessage{
+    int32 id = 1;
+    string name = 2;
+}

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+option go_package="./pb";
+
+import "google/protobuf/timestamp.proto";
+
+enum EmployeeStatus{
+    NORMAL = 0;
+    NO_VACATION = 1;
+    RESINGED = 2;
+    RETIRED = 3;
+}
+
+message Employee{
+    int32 id = 1;
+    int32 no = 2;
+    string name = 3;
+    // float salary = 4;
+
+    MonthSalary monthSalary = 5;
+    EmployeeStatus status = 6;
+    google.protobuf.Timestamp lastModified = 7;
+
+    reserved 4;
+    reserved "salary";
+}
+
+message MonthSalary{
+    float basic = 1;
+    float bonus = 2;
+}
+
+message GetByNoRequest{
+    int32 no = 1;
+}
+
+message EmployeeResponse{
+    Employee employee = 1;
+}
+
+message GetAllRequest{}
+
+message AddPhotoRequest{
+    bytes data = 1;
+}
+
+message AddPhotoResponse{
+    bool isOk = 1;
+}
+
+message SaveEmployeeRequest{
+    Employee employee = 1;
+}
+
+service EmployeeService{
+    // 一元消息
+    rpc GetByNo(GetByNoRequest) returns (EmployeeResponse);
+    // server stream
+    // 获取所有员工
+    rpc GetAll(GetAllRequest) returns (stream EmployeeResponse);
+    // client stream
+    // 上传头像信息
+    rpc AllPhoto(stream AddPhotoRequest) returns (AddPhotoResponse);
+    // 双向stream
+    // 上传employee信息
+    rpc Save(SaveEmployeeRequest) returns (EmployeeResponse);
+    rpc SaveAll(stream SaveEmployeeRequest) returns (stream EmployeeResponse);
+}
