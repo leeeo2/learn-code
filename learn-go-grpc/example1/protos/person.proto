@@ -1,0 +1,25 @@
+syntax="proto3";
+
+package pb;
+
+
+option go_package="./pb";
+
+
+
+message PersonInfo{
+    string name =1;
+    int32 age =2;
+}
+
+message GetPersonReq{
+    string name=1;
+}
+
+message GetPersonRes{
+    PersonInfo person=1;
+}
+
+service Person{
+    rpc GetPerson(GetPersonReq)returns(GetPersonRes);
+}

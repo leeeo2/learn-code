@@ -5,4 +5,4 @@ protoc -I. \
 --go-grpc_out=../server/pb \
 --go-grpc_out=../client/pb \
 --go-grpc_opt=paths=source_relative \
-messages.proto
+employee.proto person.proto

@@ -8,10 +8,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/lxxxxxxx/grpc-client/client"
 	"github.com/lxxxxxxx/grpc-client/pb"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -19,28 +18,18 @@ import (
 const port = ":5001"
 
 func main() {
-	creds, err := credentials.NewClientTLSFromFile("./keys/server.pem", "127.0.0.1")
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
 
-	options := []grpc.DialOption{grpc.WithTransportCredentials(creds)}
-	conn, err := grpc.Dial("localhost"+port, options...)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	defer conn.Close()
+	client.InitClient(context.Background(), port)
 
-	// 和server不同的是，grpc会实现client的接口
-	// 我们只需要调用这些接口取数据就可以
-	client := pb.NewEmployeeServiceClient(conn)
-	getByNo(client)
-	getAll(client)
-	addPhoto(client)
-	saveAll(client)
+	getByNo(client.EmployeeService)
+	getAll(client.EmployeeService)
+	addPhoto(client.EmployeeService)
+	saveAll(client.EmployeeService)
+
+	getPerson(client.PersonService)
 }
 
-func getByNo(client pb.EmployeeServiceClient) {
+func getByNo(client pb.EmployeeClient) {
 	res, err := client.GetByNo(context.Background(), &pb.GetByNoRequest{No: 1999})
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -48,7 +37,7 @@ func getByNo(client pb.EmployeeServiceClient) {
 	fmt.Println(res.Employee)
 }
 
-func getAll(client pb.EmployeeServiceClient) {
+func getAll(client pb.EmployeeClient) {
 	stream, err := client.GetAll(context.Background(), &pb.GetAllRequest{})
 
 	if err != nil {
@@ -66,7 +55,7 @@ func getAll(client pb.EmployeeServiceClient) {
 	}
 }
 
-func addPhoto(client pb.EmployeeServiceClient) {
+func addPhoto(client pb.EmployeeClient) {
 	imgFile, err := os.Open("avatar.jpeg")
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -108,8 +97,8 @@ func addPhoto(client pb.EmployeeServiceClient) {
 	fmt.Println("add photo isok:", res.IsOk)
 }
 
-func saveAll(client pb.EmployeeServiceClient) {
-	employees := []pb.Employee{
+func saveAll(client pb.EmployeeClient) {
+	employees := []pb.EmployeeInfo{
 		{
 			Id:   1,
 			No:   23,
@@ -166,4 +155,9 @@ func saveAll(client pb.EmployeeServiceClient) {
 	}
 	stream.CloseSend()
 	<-finishChannel
+}
+
+func getPerson(client pb.PersonClient) {
+	person, _ := client.GetPerson(context.Background(), &pb.GetPersonReq{Name: "lixiang"})
+	fmt.Println(person)
 }
